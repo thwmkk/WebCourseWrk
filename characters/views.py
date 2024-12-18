@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.views import View
 from flask import Response
 from rest_framework import viewsets
-from .models import Media, Episode, Character, Author, MediaType, User
-from .serializers import MediaSerializer, EpisodeSerializer, CharacterSerializer, AuthorSerializer, MediaTypeSerializer, UserSerializer
+from .models import Media, Episode, Character, Author, MediaType, UserMine
+from .serializers import MediaSerializer, EpisodeSerializer, CharacterSerializer, AuthorSerializer, MediaTypeSerializer, UserMineSerializer
 from rest_framework.decorators import api_view
 # Обычное представление для отображения персонажей
 class ShowCharactersView(View):
@@ -17,9 +17,3 @@ class ShowCharactersView(View):
         context = {}
         context['characters'] = Character.objects.all()  # Получение всех персонажей
         return context
-
-@api_view(['GET'])
-def get_users(request):
-    users = User.objects.all()
-    serializer = UserSerializer(users, many=True)
-    return Response(serializer.data)

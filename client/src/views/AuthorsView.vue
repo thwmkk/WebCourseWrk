@@ -108,7 +108,16 @@ const loading = ref(false);
 const authors = ref([]);
 const authorToAdd = ref({ name: '', birth_date: '', description: '' });
 const authorToEdit = ref({ id: null, name: '', birth_date: '', description: '' });
+const stats = ref({});
 
+async function fetchStats() {
+    try {
+        const response = await axios.get("/api/authors/stats/");
+        stats.value = response.data;
+    } catch (error) {
+        console.error("Ошибка при получении статистики:", error);
+    }
+}
 async function fetchAuthors() {
     loading.value = true;
     try {
@@ -144,6 +153,7 @@ async function onAuthorUpdate() {
 }
 
 onBeforeMount(async () => {
+    await fetchStats();
     await fetchAuthors();
 });
 </script>

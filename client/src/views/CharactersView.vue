@@ -19,6 +19,16 @@ const characterEditImageUrl = ref();
 
 const groupsById = computed(() => _.keyBy(groups.value, (x) => x.id));
 const mediaTypesById = computed(() => _.keyBy(mediaTypes.value, (x) => x.id));
+const stats = ref({});
+
+async function fetchStats() {
+    try {
+        const response = await axios.get("/api/characters/stats/");
+        stats.value = response.data;
+    } catch (error) {
+        console.error("Ошибка при получении статистики:", error);
+    }
+}
 
 async function fetchMediaTypes() {
     const r = await axios.get("/api/media-types/");
@@ -72,8 +82,8 @@ async function onCharacterRemove(character) {
 
 
 async function onCharacterEdit(character) {
-    characterToEdit.value = { 
-        ...character, 
+    characterToEdit.value = {
+        ...character,
         mediaType: character.media_type // Убедитесь, что вы устанавливаете mediaType правильно
     };
     characterEditImageUrl.value = character.picture; // Загружаем текущее изображение для редактирования
@@ -104,6 +114,7 @@ async function onCharacterUpdate() {
 }
 
 onBeforeMount(async () => {
+    await fetchStats();
     await fetchCharacters();
     await fetchMediaTypes();
     await fetchGroups();
@@ -151,7 +162,8 @@ function onFileChangeEdit(event) {
                     </div>
                     <div class="col-auto">
                         <div class="form-floating mb-3">
-                            <input type="number" class="form-control" v-model="characterToAdd.age" required min="0" max="100" />
+                            <input type="number" class="form-control" v-model="characterToAdd.age" required min="0"
+                                max="100" />
                             <label for="floatingInput">Возраст</label>
                         </div>
                     </div>
@@ -186,29 +198,41 @@ function onFileChangeEdit(event) {
             </form>
 
             <div v-if="loading">Гружу...</div>
+            <div class="p-2">
+                <div class="stats" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="flex-basis: 100%; margin: 0;">Статистика персонажей</h3>
+                    <p style="margin: 0;">Количество: {{ stats.count }}</p>
+                    <p style="margin: 0;">Средний возраст: {{ stats.avg_age.toFixed(2) }}</p>
+                    <p style="margin: 0;">Максимальный возраст: {{ stats.max_age }}</p>
+                    <p style="margin: 0;">Минимальный возраст: {{ stats.min_age }}</p>
+                </div>
+            </div>
 
             <div>
                 <div v-for="item in characters" class="character-item grid" :key="item.id">
                     <div class="name">{{ item.name }}</div>
                     <div v-show="item.picture">
-                        <img :src="item.picture" style="max-height: 60px; cursor: pointer;" @click="showZoomImage(item.picture)" />
+                        <img :src="item.picture" style="max-height: 60px; cursor: pointer;"
+                            @click="showZoomImage(item.picture)" />
                     </div>
                     <div class="age">{{ item.age }}</div>
                     <div>{{ mediaTypesById[item.media_type]?.name }}</div>
                     <div class="group">{{ groupsById[item.group]?.name }}</div>
                     <div class="description">{{ item.description }}</div>
                     <div class="button-container">
-                    <button class="btn btn-outline-success fixed-button" @click="onCharacterEdit(item)" data-bs-toggle="modal" data-bs-target="#editCharacterModal">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-outline-danger fixed-button" @click="onCharacterRemove(item)">
-                        <i class="bi bi-x"></i>
-                    </button>
-                </div>
+                        <button class="btn btn-outline-success fixed-button" @click="onCharacterEdit(item)"
+                            data-bs-toggle="modal" data-bs-target="#editCharacterModal">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-outline-danger fixed-button" @click="onCharacterRemove(item)">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="modal fade" id="editCharacterModal" tabindex="-1" aria-labelledby="editCharacterModalLabel" aria-hidden="true">
+            <div class="modal fade" id="editCharacterModal" tabindex="-1" aria-labelledby="editCharacterModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog custom-modal-width">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -228,7 +252,9 @@ function onFileChangeEdit(event) {
                                 <div class="mb-3">
                                     <label for="editPicture" class="form-label">Изображение</label>
                                     <input type="file" class="form-control" @change="onFileChangeEdit" />
-                                    <img v-if="characterEditImageUrl" :src="characterEditImageUrl" style="max-height: 60px; margin-top: 10px;" alt="Изображение для редактирования" />
+                                    <img v-if="characterEditImageUrl" :src="characterEditImageUrl"
+                                        style="max-height: 60px; margin-top: 10px;"
+                                        alt="Изображение для редактирования" />
                                 </div>
                                 <div class="col">
                                     <div class="form-floating mb-3">
@@ -240,7 +266,8 @@ function onFileChangeEdit(event) {
                                     <div class="form-floating mb-3">
                                         <select class="form-select" v-model="characterToEdit.mediaType" required>
                                             <option value="" disabled>Выберите тип медиа</option>
-                                            <option v-for="g in mediaTypes" :key="g.id" :value="g.id">{{ g.name }}</option>
+                                            <option v-for="g in mediaTypes" :key="g.id" :value="g.id">{{ g.name }}
+                                            </option>
                                         </select>
                                         <label for="floatingInput">Тип Медиа</label>
                                     </div>
@@ -270,7 +297,8 @@ function onFileChangeEdit(event) {
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 Закрыть
                             </button>
-                            <button type="button" class="btn btn-outline-info" data-bs-dismiss="modal" @click="onCharacterUpdate">
+                            <button type="button" class="btn btn-outline-info" data-bs-dismiss="modal"
+                                @click="onCharacterUpdate">
                                 Сохранить изменения
                             </button>
                         </div>
@@ -305,7 +333,7 @@ function onFileChangeEdit(event) {
 
 .character-item.grid {
     display: grid;
-    grid-template-columns: auto auto auto auto auto auto 100px  ;
+    grid-template-columns: auto auto auto auto auto auto 100px;
 }
 
 .fixed-button {
@@ -332,11 +360,13 @@ function onFileChangeEdit(event) {
     flex: 1;
     min-width: 150px;
 }
+
 .button-container {
     display: flex;
-    margin-left: 1350px; /* Выравнивание кнопок вправо */
+    margin-left: 1350px;
+    /* Выравнивание кнопок вправо */
     gap: 10px;
-    position: absolute; 
+    position: absolute;
 }
 
 .zoom-image-container {

@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from characters.models import Media, Episode, Character, Group, Author, MediaType, OffArt, User
+from characters.models import Media, Episode, Character, Group, Author, MediaType, OffArt
+from django.contrib.auth.models import User
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -65,7 +66,7 @@ class EpisodeSerializer(serializers.ModelSerializer):
       #      raise serializers.ValidationError('Эпизод может быть связан только с аниме.')
        # return value
 
-class UserSerializer(serializers.ModelSerializer):
+class UserMineSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'name']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']

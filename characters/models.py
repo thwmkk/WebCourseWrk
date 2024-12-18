@@ -97,7 +97,7 @@ class Episode(models.Model):
         if self.media.media_type.name != 'аниме':
             raise ValidationError('Эпизод может быть связан только с аниме.')
         
-class User(models.Model):
+class UserMine(models.Model):
   name = models.TextField("Имя")
 
   class Meta:

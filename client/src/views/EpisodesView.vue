@@ -43,7 +43,13 @@
           </div>
         </div>
       </form>
-
+      <div class="stats">
+                <h3>Статистика эпизодов</h3>
+                <p>Количество: {{ stats.count }}</p>
+                <p>Средний номер эпизода: {{ stats.avg_number.toFixed(2) }}</p>
+                <p>Минимальный номер эпизода: {{ stats.max_number }}</p>
+                <p>Максимальный номер эпизода: {{ stats.min_number }}</p>
+            </div>
       <div v-if="loading">Гружу...</div>
 
       <div>
@@ -136,6 +142,16 @@ const mediaItems = ref([]);
 const episodeToAdd = ref({ title: '', number: '', description: '', release_date: '', media: null });
 const episodeToEdit = ref({});
 const loading = ref(false);
+const stats = ref({});
+
+async function fetchStats() {
+    try {
+        const response = await axios.get("/api/episodes/stats/");
+        stats.value = response.data;
+    } catch (error) {
+        console.error("Ошибка при получении статистики:", error);
+    }
+}
 
 async function fetchEpisodes() {
   loading.value = true;
@@ -211,6 +227,7 @@ const filteredMediaItems = computed(() => {
 });
 
 onBeforeMount(async () => {
+  await fetchStats();
   await fetchEpisodes();
   await fetchMediaItems();
 });

@@ -13,6 +13,16 @@ const mediaTypes = ref([]);
 const authors = ref([]);
 const mediaToAdd = ref({ title: '', release_year: '', description: '', media_type: null, author: null });
 const mediaToEdit = ref({});
+const stats = ref({});
+
+async function fetchStats() {
+    try {
+        const response = await axios.get("/api/media/stats/");
+        stats.value = response.data;
+    } catch (error) {
+        console.error("Ошибка при получении статистики:", error);
+    }
+}
 
 const mediaTypesById = computed(() => {
   return _.keyBy(mediaTypes.value, (x) => x.id);
@@ -88,6 +98,7 @@ async function onMediaUpdate() {
 }
 
 onBeforeMount(async () => {
+  await fetchStats();
   await fetchMediaItems();
   await fetchMediaTypes();
   await fetchAuthors();
@@ -143,9 +154,14 @@ onBeforeMount(async () => {
           </div>
         </div>
       </form>
-
+      <div class="stats">
+                <h3>Статистика тайтлов</h3>
+                <p>Количество: {{ stats.count }}</p>
+                <p>Средняя дата выпуска: {{ stats.avg_release_year.toFixed(2) }}</p>
+                <p>Самая поздняя дата выпуска: {{ stats.max_release_year }}</p>
+                <p>Самая рання дата выпуска: {{ stats.min_release_year }}</p>
+            </div>
       <div v-if="loading">Гружу...</div>
-
       <div>
         <div v-for="item in mediaItems" class="media-item grid" :key="item.id">
           <div>{{ item.title }}</div>
