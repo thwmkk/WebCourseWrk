@@ -336,7 +336,7 @@ function onFileChangeEdit(event) {
     display: flex;
     margin-left: 1350px; /* Выравнивание кнопок вправо */
     gap: 10px;
-    position: absolute;
+    position: absolute; 
 }
 
 .zoom-image-container {

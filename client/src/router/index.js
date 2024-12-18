@@ -3,6 +3,7 @@ import CharactersView from '@/views/CharactersView.vue'
 import EpisodesView from '@/views/EpisodesView.vue'
 import MediaView from '@/views/MediaView.vue'
 import OffArtView from '@/views/OffArtView.vue'
+import LoginView from '@/views/LoginView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({ 
@@ -32,6 +33,11 @@ const router = createRouter({
       path: "/offart", 
       name: "OffArtView", 
       component: OffArtView, 
+    },
+    { 
+      path: "/users", 
+      name: "LoginView", 
+      component: LoginView, 
     },
   ] 
 })

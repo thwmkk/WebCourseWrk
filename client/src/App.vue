@@ -1,9 +1,6 @@
-<script setup>
-</script>
-
 <template>
   <div>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary" style="padding: 0 1.25rem 0 1.25rem;">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" style="padding: 0 1.25rem;">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">Evangelion</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
@@ -30,17 +27,24 @@
           </ul>
           <form class="d-flex">
             <ul class="navbar-nav">
-              <li class="nav-item dropdown">
+              <li class="nav-item dropdown" style="margin-right: 100px;">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                   aria-expanded="false">
-                  Пользователь
+                  {{ username }}
                 </a>
                 <ul class="dropdown-menu">
+                  <li v-if="isSuperUser">
+                    <label for="user-select" class="dropdown-item">Выберите пользователя:</label>
+                    <select id="user-select" @change="filterByUser($event.target.value)">
+                      <option value="">Все пользователи</option>
+                      <option v-for="user in users" :key="user.id" :value="user.id">{{ user.username }}</option>
+                    </select>
+                  </li>
                   <li><a class="dropdown-item" href="/admin">Админка</a></li>
                 </ul>
               </li>
             </ul>
-            <router-link class="nav-link" to="/">
+            <router-link class="nav-link" to="/users">
               <button class="btn btn-outline-info" type="button">
                 <i class="bi bi-person-fill"></i>
               </button>
@@ -50,9 +54,26 @@
       </div>
     </nav>
     <div>
-      <router-view />
+      <router-view :characters="filteredCharacters" /> <!-- Передаем отфильтрованных персонажей -->
     </div>
   </div>
 </template>
 
-<style scoped></style>
+<script setup>
+import { onMounted } from 'vue';
+import { storeToRefs } from "pinia";
+import useUserStore from "./stores/userStore";
+
+const userStore = useUserStore();
+const { isSuperUser, username, users, filteredCharacters } = storeToRefs(userStore);
+
+// Функция фильтрации пользователей
+const filterByUser = (userId) => {
+  userStore.filterCharactersByUser(userId); // Вызов метода фильтрации для персонажей
+};
+
+onMounted(() => {
+  userStore.loadUsers(); // Загружаем пользователей при монтировании
+  userStore.loadCharacters(); // Загружаем персонажей при монтировании
+});
+</script>

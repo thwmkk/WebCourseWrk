@@ -19,7 +19,7 @@ class Character(models.Model):
     group = models.ForeignKey("Group", on_delete=models.CASCADE, null=True, related_name='characters',verbose_name="Группа")
     description = models.TextField(verbose_name="Описание персонажа",default='Описание отсутствует')
     media_type = models.ForeignKey("MediaType", on_delete=models.CASCADE, null=True, related_name='characters_for_media',verbose_name="Откуда")
-
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE, verbose_name="Пользователь", null=True)
     class Meta:
         verbose_name = "Персонаж"
         verbose_name_plural = "Персонажи"
@@ -67,6 +67,7 @@ class Media(models.Model):
     description = models.TextField(verbose_name="Описание")
     media_type = models.ForeignKey('MediaType', on_delete=models.CASCADE, verbose_name="Тип медиа")
     author = models.ForeignKey('Author', on_delete=models.CASCADE, verbose_name="Автор")  # Не допускает NULL
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE, verbose_name="Пользователь", null=True)
 
     class Meta:
         verbose_name = "Медиа"
@@ -95,4 +96,14 @@ class Episode(models.Model):
         print(f"Тип медиа: {self.media.media_type.name}")  # Отладочный вывод
         if self.media.media_type.name != 'аниме':
             raise ValidationError('Эпизод может быть связан только с аниме.')
+        
+class User(models.Model):
+  name = models.TextField("Имя")
+
+  class Meta:
+    verbose_name = "Пользователь"
+    verbose_name_plural = "Пользователи"
+
+  def str(self) -> str:
+    return self.name
 
