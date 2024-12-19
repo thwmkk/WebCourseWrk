@@ -213,6 +213,13 @@ class OffArtViewset(
     GenericViewSet ):
       queryset = OffArt.objects.all()
       serializer_class = OffArtSerializer
+    # Метод для агрегатной статистики
+      @action(detail=False, methods=["GET"], url_path="stats")
+      def get_stats(self, request, *args, **kwargs):
+          stats = OffArt.objects.aggregate(
+              count=Count("id"),
+          )
+          return Response(stats)
       
 class UserMineViewset(
     mixins.CreateModelMixin, 

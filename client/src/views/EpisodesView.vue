@@ -43,17 +43,62 @@
           </div>
         </div>
       </form>
-      <div class="stats">
-                <h3>Статистика эпизодов</h3>
-                <p>Количество: {{ stats.count }}</p>
-                <p>Средний номер эпизода: {{ stats.avg_number.toFixed(2) }}</p>
-                <p>Минимальный номер эпизода: {{ stats.max_number }}</p>
-                <p>Максимальный номер эпизода: {{ stats.min_number }}</p>
-            </div>
+      <div class="p-2">
+        <div class="stats" style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <h3 style="flex-basis: 100%; margin: 0;">Статистика эпизодов</h3>
+          <p style="margin: 0;">Количество: {{ stats.count }}</p>
+          <p style="margin: 0;">Средний номер эпизода: {{ stats.avg_number.toFixed(2) }}</p>
+          <p style="margin: 0;">Минимальный номер эпизода: {{ stats.max_number }}</p>
+          <p style="margin: 0;">Максимальный номер эпизода: {{ stats.min_number }}</p>
+          <button class="btn btn-outline-primary" data-bs-toggle="modal"
+            data-bs-target="#filterModal">Фильтровать</button>
+        </div>
+      </div>
       <div v-if="loading">Гружу...</div>
 
+      <!-- Модальное окно фильтрации -->
+      <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="filterModalLabel">Фильтрация эпизодов</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="number-filter" class="form-label">Номер:</label>
+                <input type="number" id="number-filter" v-model="filterNumber" placeholder="Номер"
+                  class="form-control" />
+              </div>
+              <div class="mb-3">
+                <label for="date-filter" class="form-label">Дата выпуска:</label>
+                <input type="date" id="date-filter" v-model="filterReleaseDate" class="form-control" />
+              </div>
+              <div class="mb-3">
+                <label for="media-type-select" class="form-label">Тип медиа:</label>
+                <select id="media-type-select" v-model="selectedMediaType" class="form-select">
+                  <option value="">Все</option>
+                  <option v-for="media in mediaItems" :key="media.id" :value="media.id">
+                    {{ media.title }}
+                  </option>
+                </select>
+              </div>
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+              <button type="button" class="btn btn-primary" @click="applyFilters"
+                data-bs-dismiss="modal">Отфильтровать</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
       <div>
-        <div v-for="episode in episodes" class="episode-item grid" :key="episode.id">
+
+        <div v-for="episode in filteredEpisodes" class="episode-item grid" :key="episode.id">
           <div>{{ episode.title }}</div>
           <div>{{ episode.number }}</div>
           <div>{{ new Date(episode.release_date).toLocaleDateString() }}</div>
@@ -144,13 +189,26 @@ const episodeToEdit = ref({});
 const loading = ref(false);
 const stats = ref({});
 
+const filterNumber = ref('');
+const filterReleaseDate = ref('');
+const selectedMediaType = ref(''); // Инициализация переменной для выбранного типа медиа
+
+const filteredEpisodes = computed(() => {
+  return episodes.value.filter(episode => {
+    const matchesNumber = filterNumber.value ? episode.number === Number(filterNumber.value) : true;
+    const matchesReleaseDate = filterReleaseDate.value ? new Date(episode.release_date).toISOString().split('T')[0] === filterReleaseDate.value : true;
+    const matchesMedia = selectedMediaType.value ? episode.media === selectedMediaType.value : true; // Используем selectedMediaType
+    return matchesNumber && matchesReleaseDate && matchesMedia;
+  });
+});
+
 async function fetchStats() {
-    try {
-        const response = await axios.get("/api/episodes/stats/");
-        stats.value = response.data;
-    } catch (error) {
-        console.error("Ошибка при получении статистики:", error);
-    }
+  try {
+    const response = await axios.get("/api/episodes/stats/");
+    stats.value = response.data;
+  } catch (error) {
+    console.error("Ошибка при получении статистики:", error);
+  }
 }
 
 async function fetchEpisodes() {

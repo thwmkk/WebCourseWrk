@@ -16,6 +16,16 @@ const offArtToEdit = ref({ id: null, media_type: null, picture: null });
 const offArtAddImageUrl = ref();
 const offArtEditImageUrl = ref();
 
+const stats = ref({});
+async function fetchStats() {
+    try {
+        const response = await axios.get("/api/off-arts/stats/");
+        stats.value = response.data;
+    } catch (error) {
+        console.error("Ошибка при получении статистики:", error);
+    }
+}
+
 const media_type = computed(() => {
     return _.keyBy(mediaTypes.value, (x) => x.id);
 });
@@ -78,6 +88,7 @@ async function onOffArtUpdate() {
 }
 
 onBeforeMount(async () => {
+    await fetchStats();
     await fetchOffArts();
     await fetchMediaTypes();
 });
@@ -134,7 +145,14 @@ function onFileChangeEdit(event) {
             </form>
 
             <div v-if="loading">Гружу...</div>
-
+            <div class="p-2">
+                <div class="stats" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="flex-basis: 100%; margin: 0;">Статистика артов</h3>
+                    <p style="margin: 0;">Количество: {{ stats.count }}</p>
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal"
+                        data-bs-target="#filterModal">Фильтровать</button>
+                </div>
+            </div>
             <div>
                 <div v-for="item in offArts" class="off-art-item grid" :key="item.id">
                     <div v-show="item.picture">

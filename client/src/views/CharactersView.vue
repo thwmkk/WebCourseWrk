@@ -18,7 +18,8 @@
                     </div>
                     <div class="col-auto">
                         <div class="form-floating mb-3">
-                            <input type="number" class="form-control" v-model="characterToAdd.age" required min="0" max="100" />
+                            <input type="number" class="form-control" v-model="characterToAdd.age" required min="0"
+                                max="100" />
                             <label for="floatingInput">Возраст</label>
                         </div>
                     </div>
@@ -52,45 +53,47 @@
                 </div>
             </form>
 
-            
+
 
             <!-- Модальное окно фильтрации -->
-<!-- Модальное окно фильтрации -->
-<!-- Модальное окно фильтрации -->
-<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="filterModalLabel">Фильтрация персонажей</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="age-filter" class="form-label">Возраст:</label>
-                    <input type="number" id="age-filter" v-model="filterAge" placeholder="Возраст" class="form-control" />
+            <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="filterModalLabel">Фильтрация персонажей</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="age-filter" class="form-label">Возраст:</label>
+                                <input type="number" id="age-filter" v-model="filterAge" placeholder="Возраст"
+                                    class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="group-select" class="form-label">Группа:</label>
+                                <select id="group-select" v-model="selectedGroup" class="form-select">
+                                    <option value="">Все</option>
+                                    <option v-for="g in groups" :key="g.id" :value="g.id">{{ g.name }}</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="media-type-select" class="form-label">Тип медиа:</label>
+                                <select id="media-type-select" v-model="selectedMediaType" class="form-select">
+                                    <option value="">Все</option>
+                                    <option v-for="mt in mediaTypes" :key="mt.id" :value="mt.id">{{ mt.name }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                            <button type="button" class="btn btn-primary" @click="applyFilters"
+                                data-bs-dismiss="modal">Отфильтровать</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="group-select" class="form-label">Группа:</label>
-                    <select id="group-select" v-model="selectedGroup" class="form-select">
-                        <option value="">Все</option>
-                        <option v-for="g in groups" :key="g.id" :value="g.id">{{ g.name }}</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="media-type-select" class="form-label">Тип медиа:</label>
-                    <select id="media-type-select" v-model="selectedMediaType" class="form-select">
-                        <option value="">Все</option>
-                        <option v-for="mt in mediaTypes" :key="mt.id" :value="mt.id">{{ mt.name }}</option>
-                    </select>
-                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary" @click="applyFilters" data-bs-dismiss="modal">Отфильтровать</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 
@@ -102,7 +105,8 @@
                     <p style="margin: 0;">Средний возраст: {{ stats.avg_age.toFixed(2) }}</p>
                     <p style="margin: 0;">Максимальный возраст: {{ stats.max_age }}</p>
                     <p style="margin: 0;">Минимальный возраст: {{ stats.min_age }}</p>
-                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#filterModal">Фильтровать</button>
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal"
+                        data-bs-target="#filterModal">Фильтровать</button>
                 </div>
             </div>
 
@@ -110,14 +114,16 @@
                 <div v-for="item in filteredCharacters" class="character-item grid" :key="item.id">
                     <div class="name">{{ item.name }}</div>
                     <div v-show="item.picture">
-                        <img :src="item.picture" style="max-height: 60px; cursor: pointer;" @click="showZoomImage(item.picture)" />
+                        <img :src="item.picture" style="max-height: 60px; cursor: pointer;"
+                            @click="showZoomImage(item.picture)" />
                     </div>
                     <div class="age">{{ item.age }}</div>
                     <div>{{ mediaTypesById[item.media_type]?.name }}</div>
                     <div class="group">{{ groupsById[item.group]?.name }}</div>
                     <div class="description">{{ item.description }}</div>
                     <div class="button-container">
-                        <button class="btn btn-outline-success fixed-button" @click="onCharacterEdit(item)" data-bs-toggle="modal" data-bs-target="#editCharacterModal">
+                        <button class="btn btn-outline-success fixed-button" @click="onCharacterEdit(item)"
+                            data-bs-toggle="modal" data-bs-target="#editCharacterModal">
                             <i class="bi bi-pencil"></i>
                         </button>
                         <button class="btn btn-outline-danger fixed-button" @click="onCharacterRemove(item)">
@@ -127,7 +133,8 @@
                 </div>
             </div>
 
-            <div class="modal fade" id="editCharacterModal" tabindex="-1" aria-labelledby="editCharacterModalLabel" aria-hidden="true">
+            <div class="modal fade" id="editCharacterModal" tabindex="-1" aria-labelledby="editCharacterModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog custom-modal-width">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -145,7 +152,9 @@
                                 <div class="mb-3">
                                     <label for="editPicture" class="form-label">Изображение</label>
                                     <input type="file" class="form-control" @change="onFileChangeEdit" />
-                                    <img v-if="characterEditImageUrl" :src="characterEditImageUrl" style="max-height: 60px; margin-top: 10px;" alt="Изображение для редактирования" />
+                                    <img v-if="characterEditImageUrl" :src="characterEditImageUrl"
+                                        style="max-height: 60px; margin-top: 10px;"
+                                        alt="Изображение для редактирования" />
                                 </div>
                                 <div class="col">
                                     <div class="form-floating mb-3">
@@ -157,7 +166,8 @@
                                     <div class="form-floating mb-3">
                                         <select class="form-select" v-model="characterToEdit.mediaType" required>
                                             <option value="" disabled>Выберите тип медиа</option>
-                                            <option v-for="g in mediaTypes" :key="g.id" :value="g.id">{{ g.name }}</option>
+                                            <option v-for="g in mediaTypes" :key="g.id" :value="g.id">{{ g.name }}
+                                            </option>
                                         </select>
                                         <label for="floatingInput">Тип Медиа</label>
                                     </div>
@@ -185,7 +195,8 @@
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                            <button type="button" class="btn btn-outline-info" data-bs-dismiss="modal" @click="onCharacterUpdate">Сохранить изменения</button>
+                            <button type="button" class="btn btn-outline-info" data-bs-dismiss="modal"
+                                @click="onCharacterUpdate">Сохранить изменения</button>
                         </div>
                     </div>
                 </div>

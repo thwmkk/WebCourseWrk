@@ -15,13 +15,28 @@ const mediaToAdd = ref({ title: '', release_year: '', description: '', media_typ
 const mediaToEdit = ref({});
 const stats = ref({});
 
+const filterDate = ref('');
+const filterMediaType = ref('');
+const filterAuthor = ref('');
+
+const filteredMediaItems = computed(() => {
+    return mediaItems.value.filter(item => {
+        const matchesDate = filterDate.value ? new Date(item.release_year).toISOString().split('T')[0] === filterDate.value : true;
+        const matchesMediaType = filterMediaType.value ? item.media_type === filterMediaType.value : true;
+        const matchesAuthor = filterAuthor.value ? item.author === filterAuthor.value : true;
+        return matchesDate && matchesMediaType && matchesAuthor;
+    });
+});
+
+
+
 async function fetchStats() {
-    try {
-        const response = await axios.get("/api/media/stats/");
-        stats.value = response.data;
-    } catch (error) {
-        console.error("Ошибка при получении статистики:", error);
-    }
+  try {
+    const response = await axios.get("/api/media/stats/");
+    stats.value = response.data;
+  } catch (error) {
+    console.error("Ошибка при получении статистики:", error);
+  }
 }
 
 const mediaTypesById = computed(() => {
@@ -154,16 +169,20 @@ onBeforeMount(async () => {
           </div>
         </div>
       </form>
-      <div class="stats">
-                <h3>Статистика тайтлов</h3>
-                <p>Количество: {{ stats.count }}</p>
-                <p>Средняя дата выпуска: {{ stats.avg_release_year.toFixed(2) }}</p>
-                <p>Самая поздняя дата выпуска: {{ stats.max_release_year }}</p>
-                <p>Самая рання дата выпуска: {{ stats.min_release_year }}</p>
-            </div>
+      <div class="p-2">
+        <div class="stats" style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <h3 style="flex-basis: 100%; margin: 0;">Статистика тайтлов</h3>
+          <p style="margin: 0;">Количество: {{ stats.count }}</p>
+          <p style="margin: 0;">Средняя дата выпуска: {{ stats.avg_release_year.toFixed(2) }}</p>
+          <p style="margin: 0;">Самая поздняя дата выпуска: {{ stats.max_release_year }}</p>
+          <p style="margin: 0;">Самая рання дата выпуска: {{ stats.min_release_year }}</p>
+          <button class="btn btn-outline-primary" data-bs-toggle="modal"
+            data-bs-target="#filterModal">Фильтровать</button>
+        </div>
+      </div>
       <div v-if="loading">Гружу...</div>
       <div>
-        <div v-for="item in mediaItems" class="media-item grid" :key="item.id">
+        <div v-for="item in filteredMediaItems" class="media-item grid" :key="item.id">
           <div>{{ item.title }}</div>
           <div>{{ new Date(item.release_year).toLocaleDateString() }}</div>
           <div>{{ mediaTypesById[item.media_type]?.name }}</div>
@@ -178,7 +197,40 @@ onBeforeMount(async () => {
           </button>
         </div>
       </div>
-
+      <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="filterModalLabel">Фильтрация медиа</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                  </div>
+                  <div class="modal-body">
+                      <div class="mb-3">
+                          <label for="date-filter" class="form-label">Дата выпуска:</label>
+                          <input type="date" id="date-filter" v-model="filterDate" class="form-control" />
+                      </div>
+                      <div class="mb-3">
+                          <label for="media-type-select" class="form-label">Тип медиа:</label>
+                          <select id="media-type-select" v-model="filterMediaType" class="form-select">
+                              <option value="">Все</option>
+                              <option v-for="mt in mediaTypes" :key="mt.id" :value="mt.id">{{ mt.name }}</option>
+                          </select>
+                      </div>
+                      <div class="mb-3">
+                          <label for="author-select" class="form-label">Автор:</label>
+                          <select id="author-select" v-model="filterAuthor" class="form-select">
+                              <option value="">Все</option>
+                              <option v-for="a in authors" :key="a.id" :value="a.id">{{ a.name }}</option>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                      <button type="button" class="btn btn-primary" @click="applyFilters" data-bs-dismiss="modal">Отфильтровать</button>
+                  </div>
+              </div>
+          </div>
+      </div>
       <div class="modal fade" id="editMediaModal" tabindex="-1" aria-labelledby="editMediaModalLabel"
         aria-hidden="true">
         <div class="modal-dialog custom-modal-width">
@@ -203,7 +255,7 @@ onBeforeMount(async () => {
                     <label for="floatingInput">Год выпуска</label>
                   </div>
                 </div>
-               
+
                 <div class="col-auto">
                   <div class="form-floating mb-3">
                     <select class="form-select" v-model="mediaToEdit.media_type">

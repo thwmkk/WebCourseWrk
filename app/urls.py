@@ -4,8 +4,6 @@ from django.urls import path, include  # Импортируйте include
 from characters.api import CharactersViewset, MediaViewSet, EpisodeViewSet, AuthorViewSet, MediaTypeViewSet, GroupViewSet, OffArtViewset, UserMineViewset
 from rest_framework.routers import DefaultRouter  # Убедитесь, что вы импортируете из правильного модуля
 from django.conf.urls.static import static
-
-
 router = DefaultRouter()
 router.register("characters", CharactersViewset, basename="characters")
 router.register("media", MediaViewSet, basename="media")
