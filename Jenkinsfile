@@ -15,7 +15,7 @@
                 parallel {
                     stage('Backend') {
                         steps {
-                            echo "Build for backend on ${env.BRANCH_NAME} ..."
+                            echo "Build for backend ..."
                             bat """
                                 conda env create -f environment.yml
                                 conda run -n ${env.CONDA_ENV_NAME} python manage.py makemigrations
@@ -25,7 +25,7 @@
                     }
                     stage('Frontend') {
                         steps {
-                            echo "Build for frontend on ${env.BRANCH_NAME} ..."
+                            echo "Build for frontend ..."
                             bat '''
                                 cd client
                                 npm install
