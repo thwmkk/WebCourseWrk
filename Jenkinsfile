@@ -1,9 +1,12 @@
     pipeline {
         agent any
 
-        triggers {
-            pollSCM('* * * * *')
-        }
+        properties([
+            pipelineTriggers([
+                pollSCM('* * * * *')
+            ])
+        ])
+
 
         environment {
             CONDA_ENV_NAME = 'web-eva'
@@ -12,22 +15,20 @@
         stages {
             stage('Checkout') {
                 steps {
-                    git branch: 'main',
-                        url: 'https://github.com/thwmkk/WebCourseWrk.git',
-                        credentialsId: 'github-token'
-                }
-            }
-            stage('Branch Validation') {
-                steps {
                     script {
-                        echo "Current branch: ${env.BRANCH_NAME}"
+                        def gitBranch = sh(
+                            script: 'git rev-parse --abbrev-ref HEAD',
+                            returnStdout: true
+                        ).trim()
+                    
+                        echo "Current branch: ${gitBranch}"
 
-                        if (env.BRANCH_NAME != 'main') {
+                        if (gitBranch != 'main') {
                             currentBuild.result = 'ABORTED'
                             error("Pipeline aborted: only main branch is allowed to build")
                         }
-                        
-                        echo "Building for ${env.BRANCH_NAME} branch ..."
+                    
+                        echo "Building for ${gitBranch} branch ..."
                     }
                 }
             }
