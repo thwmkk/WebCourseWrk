@@ -23,7 +23,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: "${env.BRANCH_NAME}",
-                    url: 'https://github.com/thwmkk/WebCourseWrk.git'
+                    url: 'https://github.com/thwmkk/WebCourseWrk.git',
                     credentialsId: 'github-token'
             }
         }
