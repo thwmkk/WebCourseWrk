@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.views import View
-from flask import Response
 from rest_framework import viewsets
 from .models import Media, Episode, Character, Author, MediaType, UserMine
 from .serializers import MediaSerializer, EpisodeSerializer, CharacterSerializer, AuthorSerializer, MediaTypeSerializer, UserMineSerializer
