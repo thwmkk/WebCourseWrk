@@ -16,6 +16,8 @@
             stage('Checkout') {
                 steps {
                     script {
+                        Thread.sleep(5000)
+
                         def gitBranch = sh(
                             script: 'git rev-parse --abbrev-ref HEAD',
                             returnStdout: true
