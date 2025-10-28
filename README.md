@@ -1,2 +1,1 @@
-"# WEBcoursework" 
-fdfdf
+# INRTU Web Course Project Django + Vue
