@@ -1,11 +1,9 @@
     pipeline {
         agent any
 
-        properties([
-            pipelineTriggers([
-                pollSCM('* * * * *')
-            ])
-        ])
+        triggers {
+            pollSCM('* * * * *')
+        }
 
 
         environment {
