@@ -11,32 +11,11 @@
         }
 
         stages {
-            stage('Checkout') {
-                steps {
-                    script {
-                        Thread.sleep(5000)
-
-                        def gitBranch = sh(
-                            script: 'git rev-parse --abbrev-ref HEAD',
-                            returnStdout: true
-                        ).trim()
-                    
-                        echo "Current branch: ${gitBranch}"
-
-                        if (gitBranch != 'main') {
-                            currentBuild.result = 'ABORTED'
-                            error("Pipeline aborted: only main branch is allowed to build")
-                        }
-                    
-                        echo "Building for ${gitBranch} branch ..."
-                    }
-                }
-            }
             stage('Build') {
                 parallel {
                     stage('Backend') {
                         steps {
-                            echo 'Build for backend ...'
+                            echo "Build for backend on ${env.BRANCH_NAME} ..."
                             sh """
                                 conda env create -f environment.yml
                                 conda run -n ${env.CONDA_ENV_NAME} python manage.py makemigrations
@@ -46,7 +25,7 @@
                     }
                     stage('Frontend') {
                         steps {
-                            echo 'Build for frontend ...'
+                            echo "Build for frontend on ${env.BRANCH_NAME} ..."
                             sh '''
                                 cd client
                                 npm install
