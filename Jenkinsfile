@@ -17,9 +17,17 @@
                         steps {
                             echo "Build for backend ..."
                             bat """
+                                echo "=== Creating conda environment ==="
                                 conda env create -f environment.yml
+
+                                echo "=== Running makemigrations ==="
                                 conda run -n ${env.CONDA_ENV_NAME} python manage.py makemigrations
+
+                                echo "=== Running migrate ==="
                                 conda run -n ${env.CONDA_ENV_NAME} python manage.py migrate
+
+                                echo "=== Checking migration status ==="
+                                conda run -n ${env.CONDA_ENV_NAME} python manage.py showmigrations
                             """
                         }
                     }
