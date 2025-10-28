@@ -62,7 +62,7 @@ class OffArt(models.Model):
 
 
 class Media(models.Model):
-    title = models.CharField(max_length=255, verbose_name="Название")
+    title = models.CharField(max_length=128, verbose_name="Название")
     release_year = models.DateField(verbose_name="Год выпуска")
     description = models.TextField(verbose_name="Описание")
     media_type = models.ForeignKey('MediaType', on_delete=models.CASCADE, verbose_name="Тип медиа")
