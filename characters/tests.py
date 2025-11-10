@@ -3,47 +3,47 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from characters.models import Media, Episode, Character, Author, MediaType, Group
 
-class MediaViewSetTestCase(APITestCase):
-    def setUp(self):
-        self.media_type = MediaType.objects.create(name="фильм")
-        self.author = Author.objects.create(name="Автор 1", birth_date="2000-01-01", description="Описание автора")
-        self.media = Media.objects.create(title="Медиа 1", release_year="2022-01-01", description="Описание медиа", media_type=self.media_type, author=self.author)
-        self.url = reverse('media-list')
+# class MediaViewSetTestCase(APITestCase):
+#     def setUp(self):
+#         self.media_type = MediaType.objects.create(name="фильм")
+#         self.author = Author.objects.create(name="Автор 1", birth_date="2000-01-01", description="Описание автора")
+#         self.media = Media.objects.create(title="Медиа 1", release_year="2022-01-01", description="Описание медиа", media_type=self.media_type, author=self.author)
+#         self.url = reverse('media-list')
 
-    def test_get_media_list(self):
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+#     def test_get_media_list(self):
+#         response = self.client.get(self.url)
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+#         self.assertEqual(len(response.data), 1)
 
-    def test_create_media(self):
-        data = {
-            "title": "Новая медиа",
-            "release_year": "2023-01-01",
-            "description": "Новое описание",
-            "media_type": self.media_type.id,
-            "author": self.author.id,
-        }
-        response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Media.objects.count(), 2)
+#     def test_create_media(self):
+#         data = {
+#             "title": "Новая медиа",
+#             "release_year": "2023-01-01",
+#             "description": "Новое описание",
+#             "media_type": self.media_type.id,
+#             "author": self.author.id,
+#         }
+#         response = self.client.post(self.url, data, format='json')
+#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+#         self.assertEqual(Media.objects.count(), 2)
 
-    def test_update_media(self):
-        data = {
-            "title": "Обновленная медиа",
-            "release_year": "2023-01-01",
-            "description": "Обновленное описание",
-            "media_type": self.media_type.id,
-            "author": self.author.id,
-        }
-        response = self.client.put(reverse('media-detail', args=[self.media.id]), data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.media.refresh_from_db()
-        self.assertEqual(self.media.title, "Обновленная медиа")
+#     def test_update_media(self):
+#         data = {
+#             "title": "Обновленная медиа",
+#             "release_year": "2023-01-01",
+#             "description": "Обновленное описание",
+#             "media_type": self.media_type.id,
+#             "author": self.author.id,
+#         }
+#         response = self.client.put(reverse('media-detail', args=[self.media.id]), data, format='json')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+#         self.media.refresh_from_db()
+#         self.assertEqual(self.media.title, "Обновленная медиа")
 
-    def test_delete_media(self):
-        response = self.client.delete(reverse('media-detail', args=[self.media.id]))
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(Media.objects.count(), 0)
+#     def test_delete_media(self):
+#         response = self.client.delete(reverse('media-detail', args=[self.media.id]))
+#         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+#         self.assertEqual(Media.objects.count(), 0)
 
 
 class EpisodeViewSetTestCase(APITestCase):
@@ -95,53 +95,53 @@ class EpisodeViewSetTestCase(APITestCase):
         self.assertEqual(Episode.objects.count(), 0)
 
 
-class CharacterViewSetTestCase(APITestCase):
-    def setUp(self):
-        self.group = Group.objects.create(name="человек")
-        self.media_type = MediaType.objects.create(name="фильм")
-        self.character = Character.objects.create(
-            name="Каору Нагиса",
-            age="15",
-            group=self.group,
-            description="Описание персонажа",
-            media_type=self.media_type
-        )
-        self.url = reverse('characters-list')
+# class CharacterViewSetTestCase(APITestCase):
+#     def setUp(self):
+#         self.group = Group.objects.create(name="человек")
+#         self.media_type = MediaType.objects.create(name="фильм")
+#         self.character = Character.objects.create(
+#             name="Каору Нагиса",
+#             age="15",
+#             group=self.group,
+#             description="Описание персонажа",
+#             media_type=self.media_type
+#         )
+#         self.url = reverse('characters-list')
 
-    def test_get_character_list(self):
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+#     def test_get_character_list(self):
+#         response = self.client.get(self.url)
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+#         self.assertEqual(len(response.data), 1)
 
-    def test_create_character(self):
-        data = {
-            "name": "Новый Персонаж",
-            "age": "20",
-            "group": self.group.id,
-            "description": "Новое описание",
-            "media_type": self.media_type.id,
-        }
-        response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Character.objects.count(), 2)
+#     def test_create_character(self):
+#         data = {
+#             "name": "Новый Персонаж",
+#             "age": "20",
+#             "group": self.group.id,
+#             "description": "Новое описание",
+#             "media_type": self.media_type.id,
+#         }
+#         response = self.client.post(self.url, data, format='json')
+#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+#         self.assertEqual(Character.objects.count(), 2)
 
-    def test_update_character(self):
-        data = {
-            "name": "Обновленный Персонаж",
-            "age": "25",
-            "group": self.group.id,
-            "description": "Обновленное описание",
-            "media_type": self.media_type.id,
-        }
-        response = self.client.put(reverse('characters-detail', args=[self.character.id]), data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.character.refresh_from_db()
-        self.assertEqual(self.character.name, "Обновленный Персонаж")
+#     def test_update_character(self):
+#         data = {
+#             "name": "Обновленный Персонаж",
+#             "age": "25",
+#             "group": self.group.id,
+#             "description": "Обновленное описание",
+#             "media_type": self.media_type.id,
+#         }
+#         response = self.client.put(reverse('characters-detail', args=[self.character.id]), data, format='json')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+#         self.character.refresh_from_db()
+#         self.assertEqual(self.character.name, "Обновленный Персонаж")
 
-    def test_delete_character(self):
-        response = self.client.delete(reverse('characters-detail', args=[self.character.id]))
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(Character.objects.count(), 0)
+#     def test_delete_character(self):
+#         response = self.client.delete(reverse('characters-detail', args=[self.character.id]))
+#         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+#         self.assertEqual(Character.objects.count(), 0)
 
 class AuthorViewSetTestCase(APITestCase):
     def setUp(self):

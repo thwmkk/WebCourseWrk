@@ -1,83 +1,74 @@
-    pipeline {
-        agent any
-
-        triggers {
-            pollSCM('* * * * *')
-        }
-
-
-        environment {
-            CONDA_ENV_NAME = 'web-eva'
-        }
-
-        stages {
-            stage('Build') {
-                parallel {
-                    stage('Backend') {
-                        steps {
-                            echo "Build for backend ..."
-                            bat """
-                                echo "=== Creating conda environment ==="
-                                conda env create -f environment.yml
-
-                                echo "=== Running makemigrations ==="
-                                conda run -n ${env.CONDA_ENV_NAME} python manage.py makemigrations
-
-                                echo "=== Running migrate ==="
-                                conda run -n ${env.CONDA_ENV_NAME} python manage.py migrate
-
-                                echo "=== Checking migration status ==="
-                                conda run -n ${env.CONDA_ENV_NAME} python manage.py showmigrations
-                            """
-                        }
-                    }
-                    stage('Frontend') {
-                        steps {
-                            echo "Build for frontend ..."
-                            bat '''
-                                cd client
-                                npm install
-                            '''
-                        }
+pipeline {
+    agent any    
+    
+    stages {
+        stage('Build') {
+            parallel {
+                stage('Backend') {
+                    steps {
+                        echo "Build for backend ..."
+                        bat '''
+                            conda env create -f environment.yml                                                        
+                            conda run -n web-eva python manage.py makemigrations
+                            conda run -n web-eva python manage.py migrate
+                        '''
                     }
                 }
-            }
-            stage('Testing') {
-                steps {
-                    echo 'Testing...'
-                }
-            }
-            stage('Deploy') {
-                parallel {
-                    stage('Backend') {
-                        steps {
-                            echo 'Deploy for backend ...'
-                            // bat "conda run -n ${env.CONDA_ENV_NAME} python manage.py runserver"
-                        }
-                    }
-                    stage('Frontend') {
-                        steps {
-                            echo 'Deploy for frontend ...'
-                            // bat 'cd client && npm run dev'
-                        }
+                stage('Frontend') {
+                    steps {
+                        echo "Build for frontend ..."
+                        bat '''
+                            cd client
+                            npm i                                           
+                        '''
                     }
                 }
             }
         }
-
-        // постусловия
-        post {
-            always {
-                echo "Pipiline finished for ${env.BRANCH_NAME}"
+        stage('Test') {
+            steps {
+                echo "Running tests ..."
+                bat 'conda run -n web-eva python manage.py test characters.tests'
             }
-            success {
-                echo "Pipiline success for ${env.BRANCH_NAME}"
+        }
+        stage('Deploy') {
+            when { 
+                branch 'main'
             }
-            failure {
-                echo "Pipiline failure for ${env.BRANCH_NAME}"
-            }
-            aborted {
-                echo "Pipeline aborted for ${env.BRANCH_NAME}"
+            parallel {
+                stage('Backend') {
+                    steps {
+                        echo "Deploy for backend ..."
+                        echo 'Backend started'
+                        // bat 'conda run -n web-eva python manage.py runserver'
+                    }
+                }
+                stage('Frontend') {
+                    steps {
+                        echo "Deploy for frontend ..."
+                        echo 'Fronted started'
+                        // bat '''
+                        //     cd client
+                        //     npm run dev
+                        // '''
+                    }
+                }
             }
         }
     }
+
+    post {
+        always {
+                echo "Pipiline finished"
+            }
+            success {
+                echo "Pipiline success"
+            }
+            failure {
+                echo "Pipiline failure"
+            }
+            aborted {
+                echo "Pipeline aborted"
+            }
+    }
+}
