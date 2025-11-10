@@ -100,6 +100,7 @@ class Episode(models.Model):
 class UserMine(models.Model):
   name = models.TextField("Полное имя")
   surname = models.TextField("Фамилия")
+  age = models.TextField("Возраст")
 
   class Meta:
     verbose_name = "Пользователь"
