@@ -98,8 +98,8 @@ class Episode(models.Model):
             raise ValidationError('Эпизод может быть связан только с аниме.')
         
 class UserMine(models.Model):
-  name = models.TextField("Имя")
-  surname = models.TextField("Фамилия")
+  name = models.TextField("Имя", null=True)
+  surname = models.TextField("Фамилия", null=True)
 
 
   class Meta:

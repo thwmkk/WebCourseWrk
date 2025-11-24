@@ -3,72 +3,48 @@ pipeline {
     
     stages {
         stage('Build') {
-            parallel {
-                stage('Backend') {
-                    steps {
-                        echo "Build for backend ..."
-                        bat '''
-                            conda env create -f environment.yml                                                        
-                            conda run -n web-eva python manage.py makemigrations
-                            conda run -n web-eva python manage.py migrate
-                        '''
-                    }
-                }
-                stage('Frontend') {
-                    steps {
-                        echo "Build for frontend ..."
-                        bat '''
-                            cd client
-                            npm i                                           
-                        '''
-                    }
-                }
+            steps {
+                echo "Building images"
+                sh 'docker compose build'
             }
         }
         stage('Test') {
             steps {
                 echo "Running tests ..."
-                bat 'conda run -n web-eva python manage.py test characters.tests'
+                dir('server') {
+                    sh '''
+                        docker compose run --rm backend \
+                        poetry run python manage.py test characters.tests
+                    '''
+                }
             }
         }
         stage('Deploy') {
             when { 
                 branch 'main'
             }
-            parallel {
-                stage('Backend') {
-                    steps {
-                        echo "Deploy for backend ..."
-                        echo 'Backend started'
-                        // bat 'conda run -n web-eva python manage.py runserver'
-                    }
-                }
-                stage('Frontend') {
-                    steps {
-                        echo "Deploy for frontend ..."
-                        echo 'Fronted started'
-                        // bat '''
-                        //     cd client
-                        //     npm run dev
-                        // '''
-                    }
-                }
+            steps {
+            echo "Docker compose deploy"
+                sh '''
+                    docker compose down 
+                    docker compose up -d
+                '''
             }
         }
     }
 
     post {
         always {
-                echo "Pipiline finished"
-            }
-            success {
-                echo "Pipiline success"
-            }
-            failure {
-                echo "Pipiline failure"
-            }
-            aborted {
-                echo "Pipeline aborted"
-            }
+             echo "Pipeline finished"
+        }
+        success {
+            echo "Pipeline success"
+        }
+        failure {
+            echo "Pipeline failure"
+        }
+        aborted {
+            echo "Pipeline aborted"
+        }
     }
 }
